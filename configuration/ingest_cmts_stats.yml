@@ -1,0 +1,29 @@
+spark:
+  appName: ingest_servassure_stats-{{ spark_job_tenant }}
+  master: mesos://zk://{{ zookeeper_hosts }}/mesos
+  checkpointLocation: hdfs://{{ hdfs_hosts }}/spark-checkpoints/servassure/servassure-to-json-{{ spark_job_tenant }}
+
+kafka:
+  bootstrap.servers: {{ kafka_hosts }}
+  startingOffsets: earliest
+  security.protocol: SASL_PLAINTEXT
+  sasl.mechanism: PLAIN
+  topic.output: {{ spark_job_out[0] }}
+
+cassandra:
+  keyspace: {{ spark_job_in[0] }}
+  hosts: {{ cassandra_hosts }}
+  network: {{ spark_job_tenant }}
+
+network:    
+ nl:
+   - nl
+   - ziggo
+ de:
+  - de
+  - um
+ pl:
+  - pl
+tables:
+ - mac_hour_usage
+ - cm_hour_stats
