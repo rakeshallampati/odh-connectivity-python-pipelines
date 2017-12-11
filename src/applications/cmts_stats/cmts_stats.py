@@ -1,6 +1,7 @@
 """ Reads data from Cassandra, generate the stats out of the data and push them to kafka topic """
 import sys
 import datetime
+from datetime import timedelta
 import yaml
 from collections import defaultdict
 
@@ -73,8 +74,7 @@ def push_stats_to_kafka(configuration, data_frame):
 
 
 def get_curr_date():
-    #now = datetime.datetime.now()
-    now = datetime.datetime(2017, 10, 17, 0, 0)
+    now = datetime.datetime.now() - timedelta(days=1)
     date_string = now.strftime('%Y%m%d')
     return date_string
 
@@ -98,11 +98,7 @@ if __name__ == "__main__":
             table_dict[network].append(tables[0] + "_" + network + "_" + date_string)
             table_dict[network].append(tables[1] + "_" + network + "_" + date_string)
 
-    #print(table_dict)
-    #table_test = {'um': ['mac_hour_consumption_rate_um_20171017', 'cm_hour_stats_um_20171017'], 'pl': ['mac_hour_consumption_rate_20171017', 'cm_hour_stats_pl_20171017']}
     for network_name, table_names in table_dict.iteritems():
-    #for network_name, table_names in table_test.iteritems():
         final_data_frame = []
         final_data_frame = get_stats_from_cassandra(configuration, SPARK_SQL_CONTEXT, network_name, table_names)
-        #print(final_data_frame.count())
         push_stats_to_kafka(configuration, final_data_frame)
